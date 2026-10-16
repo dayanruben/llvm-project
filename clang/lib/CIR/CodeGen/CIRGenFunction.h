@@ -818,11 +818,12 @@ public:
     }
 
     bool isReference() const { return valueAndIsReference.getInt(); }
-    LValue getReferenceLValue(CIRGenFunction &cgf, Expr *refExpr) const {
+    LValue getReferenceLValue(CIRGenFunction &cgf, const Expr *refExpr) const {
       assert(isReference());
-      cgf.cgm.errorNYI(refExpr->getSourceRange(),
-                       "ConstantEmission::getReferenceLValue");
-      return {};
+      mlir::Value addr = cgf.getBuilder().getConstant(
+          cgf.getLoc(refExpr->getSourceRange()),
+          mlir::cast<mlir::TypedAttr>(valueAndIsReference.getPointer()));
+      return cgf.makeNaturalAlignAddrLValue(addr, refExpr->getType());
     }
 
     mlir::TypedAttr getValue() const {
@@ -1211,8 +1212,9 @@ public:
   clang::QualType buildFunctionArgList(clang::GlobalDecl gd,
                                        FunctionArgList &args);
 
-  /// Emit the function prologue: declare function arguments in the symbol
-  /// table.
+  /// Emit the function prologue: initialize the return value of an
+  /// implicit-return-zero function and declare function arguments in the
+  /// symbol table.
   void emitFunctionProlog(const FunctionArgList &args, mlir::Block *entryBB,
                           const FunctionDecl *fd, SourceLocation bodyBeginLoc);
 
