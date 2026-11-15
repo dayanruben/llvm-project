@@ -511,6 +511,9 @@ documentation](CIR/index.md) for more information regarding ClangIR's status and
 
 ### Improvements to Clang's diagnostics
 
+- Errors for invalid element types during instantiation of an `ext_vector_type`
+  now include a source location, including in alias templates. (#GH229300)
+
 - Fixed `-Wheader-guard` warnings pointing at `if` instead of the macro name
   in `#if !defined(...)` header guards.
 
@@ -1265,6 +1268,10 @@ documentation](CIR/index.md) for more information regarding ClangIR's status and
   `-Wdocumentation` or `-fparse-all-comments`) to a declaration group that spans
   multiple files, such as when a declaration uses a macro defined in an
   included header.
+
+- Fixed incorrect comparisons between `ObjCProtocolLoc` nodes stored in a
+  `DynTypedNode`. This subsequently fixes incorrect nodes found by
+  `ASTContext::getParents()` for an `ObjCProtocolLoc`.
   
 #### Miscellaneous Bug Fixes
 
